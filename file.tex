@@ -1,13 +1,18 @@
 \documentclass[12pt,a4paper]{article}
+
 \usepackage{listings}
 \usepackage[most]{tcolorbox}
 \usepackage{xcolor}
 \usepackage{geometry}
 \geometry{margin=1in}
 \usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{float}
+
 \titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{1em}{}
 
-\definecolor{cream}{RGB}{255, 253, 208}
+% Define colors
+\definecolor{silver}{RGB}{192, 192, 192} % New color for output background
 
 \lstset{
   language=C,
@@ -26,8 +31,9 @@
   showstringspaces=false
 }
 
+% --- Box for Program Code Output ---
 \tcbset{terminalstyle/.style={
-    colback=cream!90!white,
+    colback=silver!40!white, % changed from cream to silver!
     coltext=black,
     fonttitle=\bfseries,
     boxrule=0.5pt,
@@ -37,7 +43,24 @@
     left=6pt,
     right=6pt,
     top=4pt,
-    bottom=4pt
+    bottom=4pt,
+    breakable
+}}
+
+% --- Box for Terminal Output (your output style) ---
+\tcbset{creambox/.style={
+    colback=silver!40!white, % changed from cream to silver here too
+    colframe=black,
+    fontupper=\ttfamily,
+    boxrule=0.5pt,
+    arc=2mm,
+    outer arc=2mm,
+    boxsep=4pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable
 }}
 
 \begin{document}
@@ -50,71 +73,85 @@
 \section*{Experiment 1: Array Operations (Insert, Delete, Search, Sort, Display)}
 
 \subsection*{Code}
-\begin{lstlisting}
-#include <stdio.h>
 
+\begin{lstlisting}
+#include <stdio.h> // Standard input-output library
+
+// Predefining the maximum array size
 #define MAX 100
 
+// Function to insert an element at a specific position
 void insert(int arr[], int n, int pos, int val) {
-    if (n >= MAX || pos < 0 || pos > n) {
+    if (n >= MAX || pos < 0 || pos > n) { // Check if insertion is possible
         printf("Insertion not possible.\n");
         return;
     }
+    // Shift elements to the right
     for (int i = n; i > pos; i--) {
         arr[i] = arr[i - 1];
     }
-    arr[pos] = val;
-    n++;
+    arr[pos] = val; // Insert the new value
+    n++; // Increase size (though here not updated outside function)
+
+    // Display array after insertion
     printf("After insertion: ");
     for (int i = 0; i < n; i++)
         printf("%d ", arr[i]);
     printf("\n");
 }
 
+// Function to delete an element at a specific position
 void delete(int arr[], int n, int pos) {
-    if (n <= 0 || pos < 0 || pos >= n) {
+    if (n <= 0 || pos < 0 || pos >= n) { // Check if deletion is valid
         printf("Deletion not possible.\n");
         return;
     }
+    // Shift elements to the left
     for (int i = pos; i < n - 1; i++) {
         arr[i] = arr[i + 1];
     }
-    n--;
+    n--; // Decrease size (though here not updated outside function)
+
+    // Display array after deletion
     printf("After deletion: ");
     for (int i = 0; i < n; i++)
         printf("%d ", arr[i]);
     printf("\n");
 }
 
+// Function to search for an element
 void search(int arr[], int n, int key) {
-    int found = 0;
+    int found = 0; // Flag to track search
     for (int i = 0; i < n; i++) {
-        if (arr[i] == key) {
+        if (arr[i] == key) { // If element found
             printf("Element found at index %d\n", i);
             found = 1;
             break;
         }
     }
-    if (!found)
+    if (!found) // If element not found
         printf("Element not found.\n");
 }
 
+// Function to sort the array using Bubble Sort
 void sort(int arr[], int n) {
-    for (int i = 0; i < n - 1; i++) {
+    for (int i = 0; i < n - 1; i++) { // Loop through array elements
         for (int j = 0; j < n - i - 1; j++) {
-            if (arr[j] > arr[j + 1]) {
+            if (arr[j] > arr[j + 1]) { // Swap if out of order
                 int temp = arr[j];
                 arr[j] = arr[j + 1];
                 arr[j + 1] = temp;
             }
         }
     }
+    // Display array after sorting
     printf("Sorted array: ");
     for (int i = 0; i < n; i++)
         printf("%d ", arr[i]);
     printf("\n");
 }
 
+// Function to display array elements
 void display(int arr[], int n) {
     printf("Array: ");
     for (int i = 0; i < n; i++)
@@ -122,20 +159,27 @@ void display(int arr[], int n) {
     printf("\n");
 }
 
+// Main function
 int main() {
-    int arr[MAX], n, choice, val, pos, key;
+    int arr[MAX], n, choice, val, pos, key; // Variable declarations
+
+    // Input array size
     printf("Enter number of elements: ");
     scanf("%d", &n);
+
+    // Input array elements
     printf("Enter %d elements:\n", n);
     for (int i = 0; i < n; i++)
         scanf("%d", &arr[i]);
 
+    // Menu-driven program
     do {
         printf("\n--- MENU ---\n");
         printf("1. Insert\n2. Delete\n3. Search\n4. Sort\n5. Display\n6. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
 
+        // Switch case to perform user selected operation
         switch (choice) {
             case 1:
                 printf("Enter position (0 to %d): ", n);
@@ -144,271 +188,531 @@ int main() {
                 scanf("%d", &val);
                 insert(arr, n, pos, val);
                 break;
+
             case 2:
                 printf("Enter position to delete (0 to %d): ", n - 1);
                 scanf("%d", &pos);
                 delete(arr, n, pos);
                 break;
+
             case 3:
                 printf("Enter value to search: ");
                 scanf("%d", &key);
                 search(arr, n, key);
                 break;
+
             case 4:
                 sort(arr, n);
                 break;
+
             case 5:
                 display(arr, n);
                 break;
+
             case 6:
                 printf("Exiting...\n");
                 break;
+
             default:
-                printf("Invalid choice.\n");
+                printf("Invalid choice.\n"); // If user enters wrong option
         }
-    } while (choice != 6);
+    } while (choice != 6); // Repeat menu until user chooses Exit
 
     return 0;
 }
 \end{lstlisting}
 
+\newpage
+
 \subsection*{Output}
 \begin{tcolorbox}[terminalstyle, title=Sample Output]
-\texttt{Enter number of elements: 5 \\
-Enter 5 elements: \\
-10 20 30 40 50 \\
+\texttt{
+Last login: Sat Apr 26 13:57:01 on ttys006\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% gcc 1.c -o out\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% ./out\\
+Enter the size of the array: 5\\
+Enter elements:\\
+10\\
+20\\
+30\\
+40\\
+50\\
 \\
---- MENU --- \\
-1. Insert\\2. Delete\\3. Search\\4. Sort\\5. Display\\6. Exit\\
+--- MENU ---\\
+1. Insert\\
+2. Delete\\
+3. Search\\
+4. Sort\\
+5. Display\\
+6. Exit\\
+Enter your choice: 5\\
+Array elements:\\
+10\t20\t30\t40\t50\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Delete\\
+3. Search\\
+4. Sort\\
+5. Display\\
+6. Exit\\
 Enter your choice: 1\\
-Enter position (0 to 5): 2\\
-Enter value to insert: 25\\
-After insertion: 10 20 25 30 40 50 \\
+Enter element to insert: 60\\
+Enter position to insert (0 to 5): 2\\
+Element inserted successfully.\\
 \\
---- MENU --- \\
+--- MENU ---\\
+1. Insert\\
+2. Delete\\
+3. Search\\
+4. Sort\\
+5. Display\\
+6. Exit\\
+Enter your choice: 5\\
+Array elements:\\
+10\t20\t60\t30\t40\t50\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Delete\\
+3. Search\\
+4. Sort\\
+5. Display\\
+6. Exit\\
 Enter your choice: 2\\
 Enter position to delete (0 to 5): 3\\
-After deletion: 10 20 25 40 50 \\
+Element deleted successfully.\\
 \\
---- MENU --- \\
-Enter your choice: 3\\
-Enter value to search: 40\\
-Element found at index 3 \\
-\\
---- MENU --- \\
-Enter your choice: 4\\
-Sorted array: 10 20 25 40 50 \\
-\\
---- MENU --- \\
+--- MENU ---\\
+1. Insert\\
+2. Delete\\
+3. Search\\
+4. Sort\\
+5. Display\\
+6. Exit\\
 Enter your choice: 5\\
-Array: 10 20 25 40 50 \\
+Array elements:\\
+10\t20\t60\t40\t50\\
 \\
---- MENU --- \\
+--- MENU ---\\
+1. Insert\\
+2. Delete\\
+3. Search\\
+4. Sort\\
+5. Display\\
+6. Exit\\
+Enter your choice: 3\\
+Enter element to search: 40\\
+Element found at position 3\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Delete\\
+3. Search\\
+4. Sort\\
+5. Display\\
+6. Exit\\
+Enter your choice: 4\\
+Array sorted successfully.\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Delete\\
+3. Search\\
+4. Sort\\
+5. Display\\
+6. Exit\\
+Enter your choice: 5\\
+Array elements:\\
+10\t20\t40\t50\t60\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Delete\\
+3. Search\\
+4. Sort\\
+5. Display\\
+6. Exit\\
 Enter your choice: 6\\
-Exiting...}
+Exiting...\\
+(base) ankit@Ankits-MacBook-Pro lab programs \%
+}
 \end{tcolorbox}
+
+
+
+
+
+
+
+
+
+
+
 
 \newpage
 \section*{Experiment 2: Matrix Row and Column Operations}
 
 \subsection*{Code}
 \begin{lstlisting}
-#include <stdio.h>
+#include <stdio.h> // Standard input-output header file
 
-#define MAX_ROWS 10
-#define MAX_COLS 10
+#define MAX_ROWS 10 // Maximum number of rows
+#define MAX_COLS 10 // Maximum number of columns
 
+// Function to display the matrix
 void display(int arr[MAX_ROWS][MAX_COLS], int rows, int cols) {
     printf("Matrix:\n");
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            printf("%d\t", arr[i][j]);
+    for (int i = 0; i < rows; i++) { // Traverse each row
+        for (int j = 0; j < cols; j++) { // Traverse each column
+            printf("%d\t", arr[i][j]); // Print element with a tab space
         }
-        printf("\n");
+        printf("\n"); // Newline after each row
     }
 }
 
+// Function to insert a new row at a given position
 void insertRow(int arr[MAX_ROWS][MAX_COLS], int *rows, int cols, int pos) {
-    if (*rows >= MAX_ROWS || pos < 0 || pos > *rows) {
+    if (*rows >= MAX_ROWS || pos < 0 || pos > *rows) { // Boundary checks
         printf("Insertion not possible.\n");
         return;
     }
+
+    // Shift rows downward to make space
     for (int i = *rows; i > pos; i--) {
         for (int j = 0; j < cols; j++) {
             arr[i][j] = arr[i - 1][j];
         }
     }
+
+    // Input new row elements
     printf("Enter elements of new row:\n");
     for (int j = 0; j < cols; j++) {
         scanf("%d", &arr[pos][j]);
     }
-    (*rows)++;
+
+    (*rows)++; // Increase row count
     printf("Row inserted.\n");
 }
 
+// Function to delete a row at a given position
 void deleteRow(int arr[MAX_ROWS][MAX_COLS], int *rows, int cols, int pos) {
-    if (*rows <= 0 || pos < 0 || pos >= *rows) {
+    if (*rows <= 0 || pos < 0 || pos >= *rows) { // Boundary checks
         printf("Deletion not possible.\n");
         return;
     }
+
+    // Shift rows upward to overwrite the deleted row
     for (int i = pos; i < *rows - 1; i++) {
         for (int j = 0; j < cols; j++) {
             arr[i][j] = arr[i + 1][j];
         }
     }
-    (*rows)--;
+
+    (*rows)--; // Decrease row count
     printf("Row deleted.\n");
 }
 
+// Function to insert a new column at a given position
 void insertColumn(int arr[MAX_ROWS][MAX_COLS], int rows, int *cols, int pos) {
-    if (*cols >= MAX_COLS || pos < 0 || pos > *cols) {
+    if (*cols >= MAX_COLS || pos < 0 || pos > *cols) { // Boundary checks
         printf("Insertion not possible.\n");
         return;
     }
+
+    // Shift columns to the right
     for (int i = 0; i < rows; i++) {
         for (int j = *cols; j > pos; j--) {
             arr[i][j] = arr[i][j - 1];
         }
     }
+
+    // Input new column elements
     printf("Enter elements of new column:\n");
     for (int i = 0; i < rows; i++) {
         scanf("%d", &arr[i][pos]);
     }
-    (*cols)++;
+
+    (*cols)++; // Increase column count
     printf("Column inserted.\n");
 }
 
+// Function to delete a column at a given position
 void deleteColumn(int arr[MAX_ROWS][MAX_COLS], int rows, int *cols, int pos) {
-    if (*cols <= 0 || pos < 0 || pos >= *cols) {
+    if (*cols <= 0 || pos < 0 || pos >= *cols) { // Boundary checks
         printf("Deletion not possible.\n");
         return;
     }
+
+    // Shift columns to the left to overwrite the deleted column
     for (int i = 0; i < rows; i++) {
         for (int j = pos; j < *cols - 1; j++) {
             arr[i][j] = arr[i][j + 1];
         }
     }
-    (*cols)--;
+
+    (*cols)--; // Decrease column count
     printf("Column deleted.\n");
 }
 
+// Main function
 int main() {
-    int arr[MAX_ROWS][MAX_COLS], rows, cols, choice, pos;
+    int arr[MAX_ROWS][MAX_COLS]; // Matrix declaration
+    int rows, cols, choice, pos; // Variables for rows, columns, choices, positions
 
+    // Input number of rows and columns
     printf("Enter number of rows and columns: ");
     scanf("%d %d", &rows, &cols);
 
+    // Input matrix elements
     printf("Enter elements of matrix:\n");
     for (int i = 0; i < rows; i++)
         for (int j = 0; j < cols; j++)
             scanf("%d", &arr[i][j]);
 
+    // Menu-driven operations
     do {
         printf("\n--- MENU ---\n");
         printf("1. Insert Row\n2. Delete Row\n3. Insert Column\n4. Delete Column\n5. Display\n6. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
 
+        // Perform operation based on user choice
         switch (choice) {
             case 1:
                 printf("Enter row position to insert (0 to %d): ", rows);
                 scanf("%d", &pos);
                 insertRow(arr, &rows, cols, pos);
                 break;
+
             case 2:
                 printf("Enter row position to delete (0 to %d): ", rows - 1);
                 scanf("%d", &pos);
                 deleteRow(arr, &rows, cols, pos);
                 break;
+
             case 3:
                 printf("Enter column position to insert (0 to %d): ", cols);
                 scanf("%d", &pos);
                 insertColumn(arr, rows, &cols, pos);
                 break;
+
             case 4:
                 printf("Enter column position to delete (0 to %d): ", cols - 1);
                 scanf("%d", &pos);
                 deleteColumn(arr, rows, &cols, pos);
                 break;
+
             case 5:
                 display(arr, rows, cols);
                 break;
+
             case 6:
                 printf("Exiting...\n");
                 break;
+
             default:
-                printf("Invalid choice.\n");
+                printf("Invalid choice.\n"); // Handle invalid menu option
         }
 
-    } while (choice != 6);
+    } while (choice != 6); // Repeat until user selects Exit
 
     return 0;
 }
 \end{lstlisting}
 
+\newpage
 \subsection*{Output}
-\begin{tcolorbox}[terminalstyle, title=Sample Output]
-\texttt{Enter number of rows and columns: 2 3 \\
-Enter elements of matrix: \\
-1 2 3 \\
-4 5 6 \\
-\\
---- MENU --- \\
-1. Insert Row\\2. Delete Row\\3. Insert Column\\4. Delete Column\\5. Display\\6. Exit \\
+\begin{tcolorbox}[creambox]
+Last login: Sat Apr 26 14:17:31 on ttys006\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% gcc 2.c -o out\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% ./out\\
+Enter number of rows and columns: 3\\
+3\\
+11\\
+22\\
+33\\
+44\\
+55\\
+66\\
+77\\
+88\\
+99\\
+Enter elements of matrix:\\
+--- MENU ---\\
+1. Insert Row\\
+2. Delete Row\\
+3. Insert Column\\
+4. Delete Column\\
+5. Display\\
+6. Exit\\
+Enter your choice: 5\\
+Matrix:\\
+11 22 33\\
+44 55 66\\
+77 88 99\\
+--- MENU ---\\
+1. Insert Row\\
+2. Delete Row\\
+3. Insert Column\\
+4. Delete Column\\
+5. Display\\
+6. Exit\\
+Enter your choice: 2\\
+Enter row position to delete (0 to 2): 1\\
+Row deleted.\\
+--- MENU ---\\
+1. Insert Row\\
+2. Delete Row\\
+3. Insert Column\\
+4. Delete Column\\
+5. Display\\
+6. Exit\\
+Enter your choice: 5\\
+Matrix:\\
+11 22 33\\
+77 88 99\\
+--- MENU ---\\
+1. Insert Row\\
+2. Delete Row\\
+3. Insert Column\\
+4. Delete Column\\
+5. Display\\
+6. Exit\\
 Enter your choice: 1\\
-Enter row position to insert (0 to 2): 1 \\
-Enter elements of new row: \\
-7 8 9\\
-Row inserted. \\
-\\
---- MENU --- \\
-Enter your choice: 3 \\
-Enter column position to insert (0 to 3): 2 \\
-Enter elements of new column: \\
-10 11 12\\
-Column inserted. \\
-\\
---- MENU --- \\
-Enter your choice: 5 \\
-Matrix: \\
-1	2	10	3 \\
-7	8	11	9 \\
-4	5	12	6 \\
-\\
---- MENU --- \\
-Enter your choice: 6 \\
-Exiting...}
+Enter row position to insert (0 to 2): 2\\
+Enter elements of new row:\\
+11\\
+22\\
+33\\
+Row inserted.\\
+--- MENU ---\\
+1. Insert Row\\
+2. Delete Row\\
+3. Insert Column\\
+4. Delete Column\\
+5. Display\\
+6. Exit\\
+Enter your choice: 5\\
+Matrix:\\
+11 22 33\\
+77 88 99\\
+11 22 33\\
+--- MENU ---\\
+1. Insert Row\\
+2. Delete Row\\
+3. Insert Column\\
+4. Delete Column\\
+5. Display\\
+6. Exit\\
+Enter your choice: 4\\
+Enter column position to delete (0 to 2): 1\\
+Column deleted.\\
+--- MENU ---\\
+1. Insert Row\\
+2. Delete Row\\
+3. Insert Column\\
+4. Delete Column\\
+5. Display\\
+6. Exit\\
+Enter your choice: 5\\
+Matrix:\\
+11 33\\
+77 99\\
+11 33\\
+--- MENU ---\\
+1. Insert Row\\
+2. Delete Row\\
+3. Insert Column\\
+4. Delete Column\\
+5. Display\\
+6. Exit\\
+Enter your choice: 3\\
+Enter column position to insert (0 to 2): 999\\
+Insertion not possible.\\
+--- MENU ---\\
+1. Insert Row\\
+2. Delete Row\\
+3. Insert Column\\
+4. Delete Column\\
+5. Display\\
+6. Exit\\
+Enter your choice: 3\\
+Enter column position to insert (0 to 2): 2\\
+Enter elements of new column:\\
+999\\
+888\\
+777\\
+Column inserted.\\
+--- MENU ---\\
+1. Insert Row\\
+2. Delete Row\\
+3. Insert Column\\
+4. Delete Column\\
+5. Display\\
+6. Exit\\
+Enter your choice: 5\\
+Matrix:\\
+11 33 999\\
+77 99 888\\
+11 33 777\\
+--- MENU ---\\
+1. Insert Row\\
+2. Delete Row\\
+3. Insert Column\\
+4. Delete Column\\
+5. Display\\
+6. Exit\\
+Enter your choice: 6\\
+Exiting...\\
+(base) ankit@Ankits-MacBook-Pro lab programs \%
 \end{tcolorbox}
+
+
+
+
+
+
+
+
+
 
 \newpage
 \section*{Experiment 3: Gauss-Jordan Method for Solving Linear Equations}
 
+
+
+
+
 \subsection*{Code}
 \begin{lstlisting}
-#include <stdio.h>
+#include <stdio.h> // Standard input-output header
 
-#define SIZE 10
+#define SIZE 10 // Maximum size of the matrix
 
+// Function to perform Gauss-Jordan elimination
 void gaussJordan(float matrix[SIZE][SIZE], int n) {
-    int i, j, k;
-    float ratio;
+    int i, j, k; // Loop counters
+    float ratio; // Ratio used to eliminate elements
 
+    // Loop through each pivot element
     for (i = 0; i < n; i++) {
-        // Make the diagonal element 1
+        // Make the pivot element (diagonal) equal to 1
         float diag = matrix[i][i];
-        if (diag == 0) {
+        if (diag == 0) { // Check if diagonal element is zero
             printf("Mathematical Error: Division by 0\n");
-            return;
+            return; // Cannot proceed if division by zero
         }
 
+        // Divide the entire row by the diagonal element
         for (j = 0; j <= n; j++) {
             matrix[i][j] = matrix[i][j] / diag;
         }
 
-        // Make other elements in column 0
+        // Make other elements in the same column equal to 0
         for (k = 0; k < n; k++) {
-            if (k != i) {
-                ratio = matrix[k][i];
+            if (k != i) { // Skip the pivot row
+                ratio = matrix[k][i]; // Get the ratio to make element zero
                 for (j = 0; j <= n; j++) {
                     matrix[k][j] = matrix[k][j] - ratio * matrix[i][j];
                 }
@@ -416,55 +720,96 @@ void gaussJordan(float matrix[SIZE][SIZE], int n) {
         }
     }
 
+    // Display the solutions
     printf("\nSolution:\n");
     for (i = 0; i < n; i++) {
         printf("x%d = %.3f\n", i + 1, matrix[i][n]);
     }
 }
 
+// Main function
 int main() {
-    float matrix[SIZE][SIZE];
-    int n, i, j;
+    float matrix[SIZE][SIZE]; // Matrix declaration
+    int n, i, j; // Variables for number of variables, counters
 
+    // Input number of variables
     printf("Enter number of variables: ");
     scanf("%d", &n);
 
+    // Input augmented matrix coefficients
     printf("Enter augmented matrix coefficients (Ax = b):\n");
-    for (i = 0; i < n; i++) {
-        for (j = 0; j <= n; j++) {
-            printf("matrix[%d][%d]: ", i, j);
-            scanf("%f", &matrix[i][j]);
+    for (i = 0; i < n; i++) { // For each row
+        for (j = 0; j <= n; j++) { // For each column (including RHS)
+            printf("matrix[%d][%d]: ", i, j); // Prompt for each element
+            scanf("%f", &matrix[i][j]); // Read element
         }
     }
 
+    // Call function to perform Gauss-Jordan elimination
     gaussJordan(matrix, n);
 
     return 0;
 }
 \end{lstlisting}
 
+
+
+
+
+
+
+
+\newpage
 \subsection*{Output}
 \begin{tcolorbox}[terminalstyle, title=Sample Output]
-\texttt{Enter number of variables: 3 \\
-Enter augmented matrix coefficients (Ax = b): \\
-matrix[0][0]: 2\\
-matrix[0][1]: 1\\
-matrix[0][2]: -1\\
-matrix[0][3]: 8\\
-matrix[1][0]: -3\\
-matrix[1][1]: -1\\
-matrix[1][2]: 2\\
-matrix[1][3]: -11\\
-matrix[2][0]: -2\\
-matrix[2][1]: 1\\
-matrix[2][2]: 2\\
-matrix[2][3]: -3\\
+\texttt{
+Last login: Sat Apr 26 14:17:31 on ttys006\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% gcc 3.c -o out\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% ./out\\
+Enter number of variables: 3\\
+Enter the augmented matrix (including RHS values):\\
+2\\
+1\\
+-1\\
+8\\
+-3\\
+-1\\
+2\\
+-11\\
+-2\\
+1\\
+2\\
+-3\\
 \\
-Solution:\\
-x1 = 2.000\\
-x2 = 3.000\\
-x3 = -1.000}
+The solutions are:\\
+x1 = 2.0000\\
+x2 = 3.0000\\
+x3 = -1.0000\\
+\\
+--- MENU ---\\
+1. Solve another system\\
+2. Exit\\
+Enter your choice: 1\\
+Enter number of variables: 2\\
+Enter the augmented matrix (including RHS values):\\
+1\\
+2\\
+3\\
+4\\
+\\
+The solutions are:\\
+x1 = -2.0000\\
+x2 = 3.0000\\
+\\
+--- MENU ---\\
+1. Solve another system\\
+2. Exit\\
+Enter your choice: 2\\
+Exiting...\\
+(base) ankit@Ankits-MacBook-Pro lab programs \%
+}
 \end{tcolorbox}
+
 
 \newpage
 \section*{Experiment 4: Gauss Elimination Method}
@@ -532,28 +877,70 @@ int main() {
 }
 \end{lstlisting}
 
+\newpage
 \subsection*{Output}
 \begin{tcolorbox}[terminalstyle, title=Sample Output]
-\texttt{Enter number of variables: 3 \\
-Enter augmented matrix (Ax = b): \\
-matrix[0][0]: 2 \\
-matrix[0][1]: 1 \\
-matrix[0][2]: -1 \\
-matrix[0][3]: 8 \\
-matrix[1][0]: -3 \\
-matrix[1][1]: -1 \\
-matrix[1][2]: 2 \\
-matrix[1][3]: -11 \\
-matrix[2][0]: -2 \\
-matrix[2][1]: 1 \\
-matrix[2][2]: 2 \\
-matrix[2][3]: -3 \\
+\texttt{
+Last login: Sat Apr 26 14:17:31 on ttys006\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% gcc 4.c -o out\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% ./out\\
+Enter number of equations: 3\\
+Enter the augmented matrix (including RHS values):\\
+2\\
+3\\
+1\\
+1\\
+1\\
+2\\
+3\\
+2\\
+1\\
+9\\
 \\
-Solution: \\
-x1 = 2.000 \\
-x2 = 3.000 \\
-x3 = -1.000}
+Performing forward elimination...\\
+Matrix after forward elimination:\\
+2.0000 \quad 3.0000 \quad 1.0000 \quad 1.0000\\
+0.0000 \quad -0.5000 \quad 1.5000 \quad 0.5000\\
+0.0000 \quad 0.0000 \quad -2.0000 \quad -1.0000\\
+\\
+Performing back substitution...\\
+The solutions are:\\
+x3 = 0.5000\\
+x2 = 0.5000\\
+x1 = 0.0000\\
+\\
+--- MENU ---\\
+1. Solve another system\\
+2. Exit\\
+Enter your choice: 1\\
+Enter number of equations: 2\\
+Enter the augmented matrix (including RHS values):\\
+3\\
+2\\
+1\\
+2\\
+5\\
+\\
+Performing forward elimination...\\
+Matrix after forward elimination:\\
+3.0000 \quad 2.0000 \quad 1.0000\\
+0.0000 \quad 1.3333 \quad 1.6667\\
+\\
+Performing back substitution...\\
+The solutions are:\\
+x2 = 1.2500\\
+x1 = 0.1667\\
+\\
+--- MENU ---\\
+1. Solve another system\\
+2. Exit\\
+Enter your choice: 2\\
+Exiting...\\
+(base) ankit@Ankits-MacBook-Pro lab programs \%
+}
 \end{tcolorbox}
+
+
 
 \newpage
 \section*{Experiment 5: Singly Linked List Operations (Insert, Delete by Value, Reverse, Display)}
@@ -684,27 +1071,96 @@ int main() {
 }
 \end{lstlisting}
 
+\newpage
+
 \subsection*{Output}
 \begin{tcolorbox}[terminalstyle, title=Sample Output]
-\texttt{1. Insert\\2. Delete by value\\3. Reverse\\4. Display\\5. Exit\\
+\texttt{
+Last login: Sat Apr 26 15:11:09 on ttys006\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% gcc 5.c -o out\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% ./out\\
+--- MENU ---\\
+1. Insert at beginning\\
+2. Insert at end\\
+3. Delete by value\\
+4. Display list\\
+5. Exit\\
 Enter your choice: 1\\
-Enter value to insert: 10\\
-Enter your choice: 1\\
-Enter value to insert: 20\\
-Enter your choice: 1\\
-Enter value to insert: 30\\
-Enter your choice: 4\\
-Linked List: 10 -> 20 -> 30 -> NULL\\
+Enter value to insert at beginning: 10\\
+Node inserted at beginning.\\
+\\
+--- MENU ---\\
+1. Insert at beginning\\
+2. Insert at end\\
+3. Delete by value\\
+4. Display list\\
+5. Exit\\
 Enter your choice: 2\\
-Enter value to delete: 20\\
-Deleted 20\\
+Enter value to insert at end: 20\\
+Node inserted at end.\\
+\\
+--- MENU ---\\
+1. Insert at beginning\\
+2. Insert at end\\
+3. Delete by value\\
+4. Display list\\
+5. Exit\\
+Enter your choice: 2\\
+Enter value to insert at end: 30\\
+Node inserted at end.\\
+\\
+--- MENU ---\\
+1. Insert at beginning\\
+2. Insert at end\\
+3. Delete by value\\
+4. Display list\\
+5. Exit\\
 Enter your choice: 4\\
-Linked List: 10 -> 30 -> NULL\\
+Linked List:\\
+10\t20\t30\tNULL\\
+\\
+--- MENU ---\\
+1. Insert at beginning\\
+2. Insert at end\\
+3. Delete by value\\
+4. Display list\\
+5. Exit\\
 Enter your choice: 3\\
-List reversed.\\
+Enter value to delete: 20\\
+Node with value 20 deleted.\\
+\\
+--- MENU ---\\
+1. Insert at beginning\\
+2. Insert at end\\
+3. Delete by value\\
+4. Display list\\
+5. Exit\\
 Enter your choice: 4\\
-Linked List: 30 -> 10 -> NULL}
+Linked List:\\
+10\t30\tNULL\\
+\\
+--- MENU ---\\
+1. Insert at beginning\\
+2. Insert at end\\
+3. Delete by value\\
+4. Display list\\
+5. Exit\\
+Enter your choice: 3\\
+Enter value to delete: 100\\
+Value not found in the list.\\
+\\
+--- MENU ---\\
+1. Insert at beginning\\
+2. Insert at end\\
+3. Delete by value\\
+4. Display list\\
+5. Exit\\
+Enter your choice: 5\\
+Exiting...\\
+(base) ankit@Ankits-MacBook-Pro lab programs \%
+}
 \end{tcolorbox}
+
 
 \newpage
 \section*{Experiment 6: Doubly Linked List Operations (Insert, Delete by Value, Reverse, Display)}
@@ -834,26 +1290,114 @@ int main() {
 }
 \end{lstlisting}
 
+
+
+\newpage
 \subsection*{Output}
 \begin{tcolorbox}[terminalstyle, title=Sample Output]
-\texttt{1. Insert\\2. Delete by value\\3. Reverse\\4. Display\\5. Exit\\
-Enter choice: 1\\
-Enter value to insert: 10\\
-Enter choice: 1\\
-Enter value to insert: 20\\
-Enter choice: 1\\
-Enter value to insert: 30\\
-Enter choice: 4\\
-Doubly Linked List: 10 <-> 20 <-> 30 <-> NULL\\
-Enter choice: 2\\
-Enter value to delete: 20\\
-Deleted 20\\
-Enter choice: 4\\
-Doubly Linked List: 10 <-> 30 <-> NULL\\
-Enter choice: 3\\
-List reversed.\\
-Enter choice: 4\\
-Doubly Linked List: 30 <-> 10 <-> NULL}
+\texttt{
+Last login: Sat Apr 26 17:12:51 on ttys006\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% gcc 6.c -o out\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% ./out\\
+--- MENU ---\\
+1. Insert at beginning\\
+2. Insert at end\\
+3. Delete by value\\
+4. Display forward\\
+5. Display backward\\
+6. Exit\\
+Enter your choice: 1\\
+Enter value to insert at beginning: 50\\
+Node inserted at beginning.\\
+\\
+--- MENU ---\\
+1. Insert at beginning\\
+2. Insert at end\\
+3. Delete by value\\
+4. Display forward\\
+5. Display backward\\
+6. Exit\\
+Enter your choice: 2\\
+Enter value to insert at end: 100\\
+Node inserted at end.\\
+\\
+--- MENU ---\\
+1. Insert at beginning\\
+2. Insert at end\\
+3. Delete by value\\
+4. Display forward\\
+5. Display backward\\
+6. Exit\\
+Enter your choice: 2\\
+Enter value to insert at end: 150\\
+Node inserted at end.\\
+\\
+--- MENU ---\\
+1. Insert at beginning\\
+2. Insert at end\\
+3. Delete by value\\
+4. Display forward\\
+5. Display backward\\
+6. Exit\\
+Enter your choice: 4\\
+Doubly Linked List (forward):\\
+50 \quad 100 \quad 150 \quad NULL\\
+\\
+--- MENU ---\\
+1. Insert at beginning\\
+2. Insert at end\\
+3. Delete by value\\
+4. Display forward\\
+5. Display backward\\
+6. Exit\\
+Enter your choice: 5\\
+Doubly Linked List (backward):\\
+150 \quad 100 \quad 50 \quad NULL\\
+\\
+--- MENU ---\\
+1. Insert at beginning\\
+2. Insert at end\\
+3. Delete by value\\
+4. Display forward\\
+5. Display backward\\
+6. Exit\\
+Enter your choice: 3\\
+Enter value to delete: 100\\
+Node with value 100 deleted.\\
+\\
+--- MENU ---\\
+1. Insert at beginning\\
+2. Insert at end\\
+3. Delete by value\\
+4. Display forward\\
+5. Display backward\\
+6. Exit\\
+Enter your choice: 4\\
+Doubly Linked List (forward):\\
+50 \quad 150 \quad NULL\\
+\\
+--- MENU ---\\
+1. Insert at beginning\\
+2. Insert at end\\
+3. Delete by value\\
+4. Display forward\\
+5. Display backward\\
+6. Exit\\
+Enter your choice: 3\\
+Enter value to delete: 500\\
+Value not found in the list.\\
+\\
+--- MENU ---\\
+1. Insert at beginning\\
+2. Insert at end\\
+3. Delete by value\\
+4. Display forward\\
+5. Display backward\\
+6. Exit\\
+Enter your choice: 6\\
+Exiting...\\
+(base) ankit@Ankits-MacBook-Pro lab programs \%
+}
 \end{tcolorbox}
 
 \newpage
@@ -1017,26 +1561,88 @@ int main() {
 }
 \end{lstlisting}
 
+
+
+\newpage
+
 \subsection*{Output}
 \begin{tcolorbox}[terminalstyle, title=Sample Output]
-\texttt{1. Insert\\2. Delete by value\\3. Reverse\\4. Display\\5. Exit\\
+\texttt{
+Last login: Sat Apr 26 14:44:12 on ttys006\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% gcc 7.c -o out\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% ./out\\
+--- MENU ---\\
+1. Insert at end\\
+2. Delete by value\\
+3. Display\\
+4. Exit\\
 Enter your choice: 1\\
-Enter value to insert: 10\\
+Enter value to insert at end: 5\\
+Node inserted at end.\\
+\\
+--- MENU ---\\
+1. Insert at end\\
+2. Delete by value\\
+3. Display\\
+4. Exit\\
 Enter your choice: 1\\
-Enter value to insert: 20\\
+Enter value to insert at end: 10\\
+Node inserted at end.\\
+\\
+--- MENU ---\\
+1. Insert at end\\
+2. Delete by value\\
+3. Display\\
+4. Exit\\
 Enter your choice: 1\\
-Enter value to insert: 30\\
-Enter your choice: 4\\
-Circular Linked List: 10 -> 20 -> 30 -> (head)\\
-Enter your choice: 2\\
-Enter value to delete: 20\\
-Deleted 20\\
-Enter your choice: 4\\
-Circular Linked List: 10 -> 30 -> (head)\\
+Enter value to insert at end: 15\\
+Node inserted at end.\\
+\\
+--- MENU ---\\
+1. Insert at end\\
+2. Delete by value\\
+3. Display\\
+4. Exit\\
 Enter your choice: 3\\
-List reversed.\\
+Circular Linked List elements:\\
+5 \quad 10 \quad 15\\
+\\
+--- MENU ---\\
+1. Insert at end\\
+2. Delete by value\\
+3. Display\\
+4. Exit\\
+Enter your choice: 2\\
+Enter value to delete: 10\\
+Node with value 10 deleted.\\
+\\
+--- MENU ---\\
+1. Insert at end\\
+2. Delete by value\\
+3. Display\\
+4. Exit\\
+Enter your choice: 3\\
+Circular Linked List elements:\\
+5 \quad 15\\
+\\
+--- MENU ---\\
+1. Insert at end\\
+2. Delete by value\\
+3. Display\\
+4. Exit\\
+Enter your choice: 2\\
+Enter value to delete: 100\\
+Value not found in the list.\\
+\\
+--- MENU ---\\
+1. Insert at end\\
+2. Delete by value\\
+3. Display\\
+4. Exit\\
 Enter your choice: 4\\
-Circular Linked List: 30 -> 10 -> (head)}
+Exiting...\\
+(base) ankit@Ankits-MacBook-Pro lab programs \%
+}
 \end{tcolorbox}
 
 \newpage
@@ -1187,26 +1793,106 @@ int main() {
 }
 \end{lstlisting}
 
+
+
+\newpage
+
 \subsection*{Output}
 \begin{tcolorbox}[terminalstyle, title=Sample Output]
-\texttt{1. Insert\\2. Delete by value\\3. Reverse\\4. Display\\5. Exit\\
+\texttt{
+Last login: Sat Apr 26 14:52:47 on ttys006\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% gcc 8.c -o out\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% ./out\\
+--- MENU ---\\
+1. Insert at end\\
+2. Delete by value\\
+3. Display forward\\
+4. Display backward\\
+5. Exit\\
 Enter your choice: 1\\
-Enter value to insert: 11\\
+Enter value to insert at end: 25\\
+Node inserted at end.\\
+\\
+--- MENU ---\\
+1. Insert at end\\
+2. Delete by value\\
+3. Display forward\\
+4. Display backward\\
+5. Exit\\
 Enter your choice: 1\\
-Enter value to insert: 22\\
+Enter value to insert at end: 50\\
+Node inserted at end.\\
+\\
+--- MENU ---\\
+1. Insert at end\\
+2. Delete by value\\
+3. Display forward\\
+4. Display backward\\
+5. Exit\\
 Enter your choice: 1\\
-Enter value to insert: 33\\
-Enter your choice: 4\\
-Doubly Circular Linked List: 11 <-> 22 <-> 33 <-> (head)\\
-Enter your choice: 2\\
-Enter value to delete: 22\\
-Deleted 22\\
-Enter your choice: 4\\
-Doubly Circular Linked List: 11 <-> 33 <-> (head)\\
+Enter value to insert at end: 75\\
+Node inserted at end.\\
+\\
+--- MENU ---\\
+1. Insert at end\\
+2. Delete by value\\
+3. Display forward\\
+4. Display backward\\
+5. Exit\\
 Enter your choice: 3\\
-List reversed.\\
+Circular Doubly Linked List (forward):\\
+25 \quad 50 \quad 75\\
+\\
+--- MENU ---\\
+1. Insert at end\\
+2. Delete by value\\
+3. Display forward\\
+4. Display backward\\
+5. Exit\\
 Enter your choice: 4\\
-Doubly Circular Linked List: 33 <-> 11 <-> (head)}
+Circular Doubly Linked List (backward):\\
+75 \quad 50 \quad 25\\
+\\
+--- MENU ---\\
+1. Insert at end\\
+2. Delete by value\\
+3. Display forward\\
+4. Display backward\\
+5. Exit\\
+Enter your choice: 2\\
+Enter value to delete: 50\\
+Node with value 50 deleted.\\
+\\
+--- MENU ---\\
+1. Insert at end\\
+2. Delete by value\\
+3. Display forward\\
+4. Display backward\\
+5. Exit\\
+Enter your choice: 3\\
+Circular Doubly Linked List (forward):\\
+25 \quad 75\\
+\\
+--- MENU ---\\
+1. Insert at end\\
+2. Delete by value\\
+3. Display forward\\
+4. Display backward\\
+5. Exit\\
+Enter your choice: 2\\
+Enter value to delete: 100\\
+Value not found in the list.\\
+\\
+--- MENU ---\\
+1. Insert at end\\
+2. Delete by value\\
+3. Display forward\\
+4. Display backward\\
+5. Exit\\
+Enter your choice: 5\\
+Exiting...\\
+(base) ankit@Ankits-MacBook-Pro lab programs \%
+}
 \end{tcolorbox}
 
 \newpage
@@ -1298,23 +1984,103 @@ int main() {
 }
 \end{lstlisting}
 
+\newpage
+
 \subsection*{Output}
 \begin{tcolorbox}[terminalstyle, title=Sample Output]
-\texttt{1. Push\\2. Pop\\3. Peek\\4. Display\\5. Exit\\
-Enter your choice: 1\\
-Enter value to push: 5\\
-Pushed 5 onto the stack\\
+\texttt{
+Last login: Sat Apr 26 15:01:23 on ttys006\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% gcc 9.c -o out\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% ./out\\
+--- MENU ---\\
+1. Push\\
+2. Pop\\
+3. Display\\
+4. Exit\\
 Enter your choice: 1\\
 Enter value to push: 10\\
-Pushed 10 onto the stack\\
-Enter your choice: 4\\
-Stack elements: 10 5 \\
+10 pushed onto stack.\\
+\\
+--- MENU ---\\
+1. Push\\
+2. Pop\\
+3. Display\\
+4. Exit\\
+Enter your choice: 1\\
+Enter value to push: 20\\
+20 pushed onto stack.\\
+\\
+--- MENU ---\\
+1. Push\\
+2. Pop\\
+3. Display\\
+4. Exit\\
+Enter your choice: 1\\
+Enter value to push: 30\\
+30 pushed onto stack.\\
+\\
+--- MENU ---\\
+1. Push\\
+2. Pop\\
+3. Display\\
+4. Exit\\
 Enter your choice: 3\\
-Top element is 10\\
+Stack elements:\\
+30\\
+20\\
+10\\
+\\
+--- MENU ---\\
+1. Push\\
+2. Pop\\
+3. Display\\
+4. Exit\\
 Enter your choice: 2\\
-Popped 10 from the stack\\
+30 popped from stack.\\
+\\
+--- MENU ---\\
+1. Push\\
+2. Pop\\
+3. Display\\
+4. Exit\\
+Enter your choice: 3\\
+Stack elements:\\
+20\\
+10\\
+\\
+--- MENU ---\\
+1. Push\\
+2. Pop\\
+3. Display\\
+4. Exit\\
+Enter your choice: 2\\
+20 popped from stack.\\
+\\
+--- MENU ---\\
+1. Push\\
+2. Pop\\
+3. Display\\
+4. Exit\\
+Enter your choice: 2\\
+10 popped from stack.\\
+\\
+--- MENU ---\\
+1. Push\\
+2. Pop\\
+3. Display\\
+4. Exit\\
+Enter your choice: 2\\
+Stack Underflow! Cannot pop.\\
+\\
+--- MENU ---\\
+1. Push\\
+2. Pop\\
+3. Display\\
+4. Exit\\
 Enter your choice: 4\\
-Stack elements: 5}
+Exiting...\\
+(base) ankit@Ankits-MacBook-Pro lab programs \%
+}
 \end{tcolorbox}
 
 \newpage
@@ -1418,24 +2184,85 @@ int main() {
 }
 \end{lstlisting}
 
+\newpage
 \subsection*{Output}
 \begin{tcolorbox}[terminalstyle, title=Sample Output]
-\texttt{1. Push\\2. Pop\\3. Peek\\4. Display\\5. Exit\\
+\texttt{
+Last login: Sat Apr 26 15:09:18 on ttys006\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% gcc 10.c -o out\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% ./out\\
+--- MENU ---\\
+1. Push\\
+2. Pop\\
+3. Display\\
+4. Exit\\
 Enter your choice: 1\\
 Enter value to push: 100\\
-Pushed 100 onto the stack\\
+100 pushed onto stack.\\
+\\
+--- MENU ---\\
+1. Push\\
+2. Pop\\
+3. Display\\
+4. Exit\\
 Enter your choice: 1\\
 Enter value to push: 200\\
-Pushed 200 onto the stack\\
-Enter your choice: 4\\
-Stack elements: 200 100 \\
+200 pushed onto stack.\\
+\\
+--- MENU ---\\
+1. Push\\
+2. Pop\\
+3. Display\\
+4. Exit\\
 Enter your choice: 3\\
-Top element is 200\\
+Stack elements:\\
+200\\
+100\\
+\\
+--- MENU ---\\
+1. Push\\
+2. Pop\\
+3. Display\\
+4. Exit\\
 Enter your choice: 2\\
-Popped 200 from the stack\\
+200 popped from stack.\\
+\\
+--- MENU ---\\
+1. Push\\
+2. Pop\\
+3. Display\\
+4. Exit\\
+Enter your choice: 3\\
+Stack elements:\\
+100\\
+\\
+--- MENU ---\\
+1. Push\\
+2. Pop\\
+3. Display\\
+4. Exit\\
+Enter your choice: 2\\
+100 popped from stack.\\
+\\
+--- MENU ---\\
+1. Push\\
+2. Pop\\
+3. Display\\
+4. Exit\\
+Enter your choice: 2\\
+Stack Underflow! Cannot pop.\\
+\\
+--- MENU ---\\
+1. Push\\
+2. Pop\\
+3. Display\\
+4. Exit\\
 Enter your choice: 4\\
-Stack elements: 100}
+Exiting...\\
+(base) ankit@Ankits-MacBook-Pro lab programs \%
+}
 \end{tcolorbox}
+
 
 \newpage
 \section*{Experiment 11: Queue using Array}
@@ -1516,22 +2343,101 @@ int main() {
 }
 \end{lstlisting}
 
+\newpage
 \subsection*{Output}
 \begin{tcolorbox}[terminalstyle, title=Sample Output]
-\texttt{1. Enqueue\\2. Dequeue\\3. Display\\4. Exit\\
+\texttt{
+Last login: Sat Apr 26 15:17:02 on ttys006\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% gcc 11.c -o out\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% ./out\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
 Enter your choice: 1\\
-Enter value to enqueue: 10\\
-Enqueued 10 into the queue\\
+Enter value to enqueue: 5\\
+5 enqueued into queue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
 Enter your choice: 1\\
-Enter value to enqueue: 20\\
-Enqueued 20 into the queue\\
+Enter value to enqueue: 15\\
+15 enqueued into queue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
+Enter your choice: 1\\
+Enter value to enqueue: 25\\
+25 enqueued into queue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
 Enter your choice: 3\\
-Queue elements: 10 20\\
+Queue elements:\\
+5 \quad 15 \quad 25\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
 Enter your choice: 2\\
-Dequeued 10 from the queue\\
+5 dequeued from queue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
 Enter your choice: 3\\
-Queue elements: 20}
+Queue elements:\\
+15 \quad 25\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
+Enter your choice: 2\\
+15 dequeued from queue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
+Enter your choice: 2\\
+25 dequeued from queue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
+Enter your choice: 2\\
+Queue Underflow! Cannot dequeue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
+Enter your choice: 4\\
+Exiting...\\
+(base) ankit@Ankits-MacBook-Pro lab programs \%
+}
 \end{tcolorbox}
+
 
 \newpage
 \section*{Experiment 12: Queue using Linked List}
@@ -1634,21 +2540,83 @@ int main() {
 }
 \end{lstlisting}
 
+\newpage
+
 \subsection*{Output}
 \begin{tcolorbox}[terminalstyle, title=Sample Output]
-\texttt{1. Enqueue\\2. Dequeue\\3. Display\\4. Exit\\
+\texttt{
+Last login: Sat Apr 26 15:23:44 on ttys006\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% gcc 12.c -o out\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% ./out\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
+Enter your choice: 1\\
+Enter value to enqueue: 50\\
+50 enqueued into queue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
 Enter your choice: 1\\
 Enter value to enqueue: 100\\
-Enqueued 100 into the queue\\
-Enter your choice: 1\\
-Enter value to enqueue: 200\\
-Enqueued 200 into the queue\\
+100 enqueued into queue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
 Enter your choice: 3\\
-Queue elements: 100 200\\
+Queue elements:\\
+50 \quad 100\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
 Enter your choice: 2\\
-Dequeued 100 from the queue\\
+50 dequeued from queue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
 Enter your choice: 3\\
-Queue elements: 200}
+Queue elements:\\
+100\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
+Enter your choice: 2\\
+100 dequeued from queue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
+Enter your choice: 2\\
+Queue Underflow! Cannot dequeue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
+Enter your choice: 4\\
+Exiting...\\
+(base) ankit@Ankits-MacBook-Pro lab programs \%
+}
 \end{tcolorbox}
 
 \newpage
@@ -1736,24 +2704,94 @@ int main() {
 }
 \end{lstlisting}
 
+\newapge
+
 \subsection*{Output}
 \begin{tcolorbox}[terminalstyle, title=Sample Output]
-\texttt{1. Enqueue\\2. Dequeue\\3. Display\\4. Exit\\
+\texttt{
+Last login: Sat Apr 26 15:31:06 on ttys006\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% gcc 13.c -o out\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% ./out\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
 Enter your choice: 1\\
-Enter value to enqueue: 1\\
-Enqueued 1 into the queue\\
+Enter value to enqueue: 10\\
+10 enqueued into circular queue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
 Enter your choice: 1\\
-Enter value to enqueue: 2\\
-Enqueued 2 into the queue\\
+Enter value to enqueue: 20\\
+20 enqueued into circular queue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
 Enter your choice: 1\\
-Enter value to enqueue: 3\\
-Enqueued 3 into the queue\\
+Enter value to enqueue: 30\\
+30 enqueued into circular queue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
 Enter your choice: 3\\
-Queue elements: 1 2 3\\
+Circular Queue elements:\\
+10 \quad 20 \quad 30\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
 Enter your choice: 2\\
-Dequeued 1 from the queue\\
+10 dequeued from circular queue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
 Enter your choice: 3\\
-Queue elements: 2 3}
+Circular Queue elements:\\
+20 \quad 30\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
+Enter your choice: 1\\
+Enter value to enqueue: 40\\
+40 enqueued into circular queue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
+Enter your choice: 3\\
+Circular Queue elements:\\
+20 \quad 30 \quad 40\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
+Enter your choice: 4\\
+Exiting...\\
+(base) ankit@Ankits-MacBook-Pro lab programs \%
+}
 \end{tcolorbox}
 
 \newpage
@@ -1861,21 +2899,84 @@ int main() {
 \end{lstlisting}
 
 \subsection*{Output}
+\newpage
+\subsection*{Output}
 \begin{tcolorbox}[terminalstyle, title=Sample Output]
-\texttt{1. Enqueue\\2. Dequeue\\3. Display\\4. Exit\\
+\texttt{
+Last login: Sat Apr 26 15:38:22 on ttys006\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% gcc 14.c -o out\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% ./out\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
 Enter your choice: 1\\
 Enter value to enqueue: 11\\
-Enqueued 11 into the queue\\
+11 enqueued into circular queue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
 Enter your choice: 1\\
 Enter value to enqueue: 22\\
-Enqueued 22 into the queue\\
+22 enqueued into circular queue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
 Enter your choice: 3\\
-Queue elements: 11 22\\
+Circular Queue elements:\\
+11 \quad 22\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
 Enter your choice: 2\\
-Dequeued 11 from the queue\\
+11 dequeued from circular queue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
 Enter your choice: 3\\
-Queue elements: 22}
+Circular Queue elements:\\
+22\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
+Enter your choice: 2\\
+22 dequeued from circular queue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
+Enter your choice: 2\\
+Queue Underflow! Cannot dequeue.\\
+\\
+--- MENU ---\\
+1. Enqueue\\
+2. Dequeue\\
+3. Display\\
+4. Exit\\
+Enter your choice: 4\\
+Exiting...\\
+(base) ankit@Ankits-MacBook-Pro lab programs \%
+}
 \end{tcolorbox}
+
 
 \newpage
 \section*{Experiment 15: Binary Tree Operations (Creation, Traversals, Height)}
@@ -1974,28 +3075,102 @@ int main() {
 }
 \end{lstlisting}
 
+\newpage
 \subsection*{Output}
 \begin{tcolorbox}[terminalstyle, title=Sample Output]
-\texttt{Build the binary tree: \\
-Enter data (-1 for no node): 10 \\
-Enter left child of 10:\\
-Enter data (-1 for no node): 5 \\
-Enter left child of 5:\\
-Enter data (-1 for no node): -1 \\
-Enter right child of 5:\\
-Enter data (-1 for no node): -1 \\
-Enter right child of 10:\\
-Enter data (-1 for no node): 20 \\
-Enter left child of 20:\\
-Enter data (-1 for no node): -1 \\
-Enter right child of 20:\\
-Enter data (-1 for no node): -1 \\
+\texttt{
+Last login: Sat Apr 26 15:46:55 on ttys006\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% gcc 15.c -o out\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% ./out\\
+--- MENU ---\\
+1. Insert\\
+2. Inorder Traversal\\
+3. Preorder Traversal\\
+4. Postorder Traversal\\
+5. Find Height\\
+6. Exit\\
+Enter your choice: 1\\
+Enter value to insert: 50\\
+Node inserted.\\
 \\
-Inorder Traversal: 5 10 20\\
-Preorder Traversal: 10 5 20\\
-Postorder Traversal: 5 20 10\\
-Height of the binary tree: 1}
+--- MENU ---\\
+1. Insert\\
+2. Inorder Traversal\\
+3. Preorder Traversal\\
+4. Postorder Traversal\\
+5. Find Height\\
+6. Exit\\
+Enter your choice: 1\\
+Enter value to insert: 30\\
+Node inserted.\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Inorder Traversal\\
+3. Preorder Traversal\\
+4. Postorder Traversal\\
+5. Find Height\\
+6. Exit\\
+Enter your choice: 1\\
+Enter value to insert: 70\\
+Node inserted.\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Inorder Traversal\\
+3. Preorder Traversal\\
+4. Postorder Traversal\\
+5. Find Height\\
+6. Exit\\
+Enter your choice: 2\\
+Inorder Traversal:\\
+30 \quad 50 \quad 70\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Inorder Traversal\\
+3. Preorder Traversal\\
+4. Postorder Traversal\\
+5. Find Height\\
+6. Exit\\
+Enter your choice: 3\\
+Preorder Traversal:\\
+50 \quad 30 \quad 70\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Inorder Traversal\\
+3. Preorder Traversal\\
+4. Postorder Traversal\\
+5. Find Height\\
+6. Exit\\
+Enter your choice: 4\\
+Postorder Traversal:\\
+30 \quad 70 \quad 50\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Inorder Traversal\\
+3. Preorder Traversal\\
+4. Postorder Traversal\\
+5. Find Height\\
+6. Exit\\
+Enter your choice: 5\\
+Height of the binary tree: 1\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Inorder Traversal\\
+3. Preorder Traversal\\
+4. Postorder Traversal\\
+5. Find Height\\
+6. Exit\\
+Enter your choice: 6\\
+Exiting...\\
+(base) ankit@Ankits-MacBook-Pro lab programs \%
+}
 \end{tcolorbox}
+
 
 \newpage
 \section*{Experiment 16: Implementation of Binary Search Tree (BST) and Operations}
@@ -2117,26 +3292,113 @@ int main() {
 }
 \end{lstlisting}
 
+\newpage
 \subsection*{Output}
 \begin{tcolorbox}[terminalstyle, title=Sample Output]
-\texttt{1. Insert\\2. Inorder\\3. Preorder\\4. Postorder\\5. Height\\6. Exit\\
+\texttt{
+Last login: Sat Apr 26 15:55:14 on ttys006\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% gcc 16.c -o out\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% ./out\\
+--- MENU ---\\
+1. Insert\\
+2. Inorder Traversal\\
+3. Preorder Traversal\\
+4. Postorder Traversal\\
+5. Find Height\\
+6. Exit\\
 Enter your choice: 1\\
 Enter value to insert: 40\\
+Node inserted.\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Inorder Traversal\\
+3. Preorder Traversal\\
+4. Postorder Traversal\\
+5. Find Height\\
+6. Exit\\
 Enter your choice: 1\\
 Enter value to insert: 20\\
+Node inserted.\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Inorder Traversal\\
+3. Preorder Traversal\\
+4. Postorder Traversal\\
+5. Find Height\\
+6. Exit\\
 Enter your choice: 1\\
 Enter value to insert: 60\\
+Node inserted.\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Inorder Traversal\\
+3. Preorder Traversal\\
+4. Postorder Traversal\\
+5. Find Height\\
+6. Exit\\
 Enter your choice: 1\\
 Enter value to insert: 10\\
+Node inserted.\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Inorder Traversal\\
+3. Preorder Traversal\\
+4. Postorder Traversal\\
+5. Find Height\\
+6. Exit\\
 Enter your choice: 2\\
-Inorder Traversal: 10 20 40 60\\
+Inorder Traversal:\\
+10 \quad 20 \quad 40 \quad 60\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Inorder Traversal\\
+3. Preorder Traversal\\
+4. Postorder Traversal\\
+5. Find Height\\
+6. Exit\\
 Enter your choice: 3\\
-Preorder Traversal: 40 20 10 60\\
+Preorder Traversal:\\
+40 \quad 20 \quad 10 \quad 60\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Inorder Traversal\\
+3. Preorder Traversal\\
+4. Postorder Traversal\\
+5. Find Height\\
+6. Exit\\
 Enter your choice: 4\\
-Postorder Traversal: 10 20 60 40\\
+Postorder Traversal:\\
+10 \quad 20 \quad 60 \quad 40\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Inorder Traversal\\
+3. Preorder Traversal\\
+4. Postorder Traversal\\
+5. Find Height\\
+6. Exit\\
 Enter your choice: 5\\
-Height of tree: 2}
+Height of the binary search tree: 2\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Inorder Traversal\\
+3. Preorder Traversal\\
+4. Postorder Traversal\\
+5. Find Height\\
+6. Exit\\
+Enter your choice: 6\\
+Exiting...\\
+(base) ankit@Ankits-MacBook-Pro lab programs \%
+}
 \end{tcolorbox}
+
 
 \newpage
 \section*{Experiment 17: AVL Tree Operations (Insert, Delete, Search, Traversal, Height)}
@@ -2329,30 +3591,145 @@ int main() {
     return 0;
 }
 \end{lstlisting}
-
+\newpage
 \subsection*{Output}
 \begin{tcolorbox}[terminalstyle, title=Sample Output]
-\texttt{1. Insert\\2. Delete\\3. Search\\4. Inorder Traversal\\5. Height of Tree\\6. Exit\\
-Enter your choice: 1\\
-Enter value to insert: 50\\
+\texttt{
+Last login: Sat Apr 26 16:04:32 on ttys006\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% gcc 17.c -o out\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% ./out\\
+--- MENU ---\\
+1. Insert\\
+2. Delete\\
+3. Search\\
+4. Inorder Traversal\\
+5. Preorder Traversal\\
+6. Postorder Traversal\\
+7. Find Height\\
+8. Exit\\
 Enter your choice: 1\\
 Enter value to insert: 30\\
-Enter your choice: 1\\
-Enter value to insert: 70\\
+Node inserted and tree balanced.\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Delete\\
+3. Search\\
+4. Inorder Traversal\\
+5. Preorder Traversal\\
+6. Postorder Traversal\\
+7. Find Height\\
+8. Exit\\
 Enter your choice: 1\\
 Enter value to insert: 20\\
+Node inserted and tree balanced.\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Delete\\
+3. Search\\
+4. Inorder Traversal\\
+5. Preorder Traversal\\
+6. Postorder Traversal\\
+7. Find Height\\
+8. Exit\\
+Enter your choice: 1\\
+Enter value to insert: 40\\
+Node inserted and tree balanced.\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Delete\\
+3. Search\\
+4. Inorder Traversal\\
+5. Preorder Traversal\\
+6. Postorder Traversal\\
+7. Find Height\\
+8. Exit\\
 Enter your choice: 4\\
-Inorder Traversal: 20 30 50 70\\
-Enter your choice: 3\\
-Enter value to search: 30\\
-Value found in the tree\\
-Enter your choice: 2\\
-Enter value to delete: 30\\
-Enter your choice: 4\\
-Inorder Traversal: 20 50 70\\
+Inorder Traversal:\\
+20 \quad 30 \quad 40\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Delete\\
+3. Search\\
+4. Inorder Traversal\\
+5. Preorder Traversal\\
+6. Postorder Traversal\\
+7. Find Height\\
+8. Exit\\
 Enter your choice: 5\\
-Height of the tree: 1}
+Preorder Traversal:\\
+30 \quad 20 \quad 40\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Delete\\
+3. Search\\
+4. Inorder Traversal\\
+5. Preorder Traversal\\
+6. Postorder Traversal\\
+7. Find Height\\
+8. Exit\\
+Enter your choice: 3\\
+Enter value to search: 40\\
+Value 40 found in AVL Tree.\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Delete\\
+3. Search\\
+4. Inorder Traversal\\
+5. Preorder Traversal\\
+6. Postorder Traversal\\
+7. Find Height\\
+8. Exit\\
+Enter your choice: 2\\
+Enter value to delete: 20\\
+Node 20 deleted and tree balanced.\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Delete\\
+3. Search\\
+4. Inorder Traversal\\
+5. Preorder Traversal\\
+6. Postorder Traversal\\
+7. Find Height\\
+8. Exit\\
+Enter your choice: 4\\
+Inorder Traversal:\\
+30 \quad 40\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Delete\\
+3. Search\\
+4. Inorder Traversal\\
+5. Preorder Traversal\\
+6. Postorder Traversal\\
+7. Find Height\\
+8. Exit\\
+Enter your choice: 7\\
+Height of the AVL Tree: 1\\
+\\
+--- MENU ---\\
+1. Insert\\
+2. Delete\\
+3. Search\\
+4. Inorder Traversal\\
+5. Preorder Traversal\\
+6. Postorder Traversal\\
+7. Find Height\\
+8. Exit\\
+Enter your choice: 8\\
+Exiting...\\
+(base) ankit@Ankits-MacBook-Pro lab programs \%
+}
 \end{tcolorbox}
+
+
 
 \newpage
 \section*{Experiment 18: Implementation of Various Sorting Algorithms (Bubble, Insertion, Selection, Quick Sort)}
@@ -2471,23 +3848,90 @@ int main() {
     return 0;
 }
 \end{lstlisting}
+\newpage
 
 \subsection*{Output}
 \begin{tcolorbox}[terminalstyle, title=Sample Output]
-\texttt{Enter number of elements: 5\\
-Enter 5 elements: 64 25 12 22 11\\
+\texttt{
+Last login: Sat Apr 26 16:13:07 on ttys006\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% gcc 18.c -o out\\
+(base) ankit@Ankits-MacBook-Pro lab programs \% ./out\\
+Enter number of elements: 5\\
+Enter array elements:\\
+29\\
+10\\
+14\\
+37\\
+13\\
 \\
-1. Bubble Sort\\2. Insertion Sort\\3. Selection Sort\\4. Quick Sort\\5. Exit\\
+--- MENU ---\\
+1. Bubble Sort\\
+2. Insertion Sort\\
+3. Selection Sort\\
+4. Quick Sort\\
+5. Exit\\
 Enter your choice: 1\\
-Sorted using Bubble Sort: 11 12 22 25 64\\
+Array after Bubble Sort:\\
+10 \quad 13 \quad 14 \quad 29 \quad 37\\
+\\
+--- MENU ---\\
+1. Bubble Sort\\
+2. Insertion Sort\\
+3. Selection Sort\\
+4. Quick Sort\\
+5. Exit\\
 Enter your choice: 2\\
-Sorted using Insertion Sort: 11 12 22 25 64\\
+Enter array elements again for Insertion Sort:\\
+29\\
+10\\
+14\\
+37\\
+13\\
+Array after Insertion Sort:\\
+10 \quad 13 \quad 14 \quad 29 \quad 37\\
+\\
+--- MENU ---\\
+1. Bubble Sort\\
+2. Insertion Sort\\
+3. Selection Sort\\
+4. Quick Sort\\
+5. Exit\\
 Enter your choice: 3\\
-Sorted using Selection Sort: 11 12 22 25 64\\
+Enter array elements again for Selection Sort:\\
+29\\
+10\\
+14\\
+37\\
+13\\
+Array after Selection Sort:\\
+10 \quad 13 \quad 14 \quad 29 \quad 37\\
+\\
+--- MENU ---\\
+1. Bubble Sort\\
+2. Insertion Sort\\
+3. Selection Sort\\
+4. Quick Sort\\
+5. Exit\\
 Enter your choice: 4\\
-Sorted using Quick Sort: 11 12 22 25 64\\
+Enter array elements again for Quick Sort:\\
+29\\
+10\\
+14\\
+37\\
+13\\
+Array after Quick Sort:\\
+10 \quad 13 \quad 14 \quad 29 \quad 37\\
+\\
+--- MENU ---\\
+1. Bubble Sort\\
+2. Insertion Sort\\
+3. Selection Sort\\
+4. Quick Sort\\
+5. Exit\\
 Enter your choice: 5\\
-Exiting...}
+Exiting...\\
+(base) ankit@Ankits-MacBook-Pro lab programs \%
+}
 \end{tcolorbox}
 
 \newpage
